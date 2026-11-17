@@ -1,0 +1,54 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Reference Frame: link_base
+      Cell Size: 0.1
+      Plane Cell Count: 16
+    - Class: rviz_default_plugins/RobotModel
+      Name: Robot
+      Description Topic: {Value: /robot_description}
+    - Class: rviz_default_plugins/TF
+      Name: TF
+      Show Names: true
+      Marker Scale: 0.15
+      Frames:
+        All Enabled: false
+        link_base: {Value: true}
+        link_eef: {Value: true}
+        sim_camera_optical_frame: {Value: true}
+    - Class: rviz_default_plugins/PointStamped
+      Name: Persona 3D (target_point)
+      Topic: {Value: /person_tracker/target_point}
+      Color: 0; 255; 100
+      Radius: 0.05
+    - Class: rviz_default_plugins/Pose
+      Name: Pose 6-DOF EEF (target_eef_pose)
+      Topic: {Value: /person_tracker/target_eef_pose}
+      Shape: Axes
+      Axes Length: 0.10
+      Axes Radius: 0.008
+    - Class: rviz_default_plugins/Image
+      Name: Seguimiento Persona (debug_image)
+      Topic: {Value: /person_tracker/debug_image}
+  Global Options:
+    Fixed Frame: link_base
+    Frame Rate: 30
+  Tools:
+    - Class: rviz_default_plugins/Interact
+    - Class: rviz_default_plugins/MoveCamera
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 1.8
+      Focal Point: {X: 0.55, Y: 0, Z: 0.25}
+      Pitch: 0.35
+      Yaw: 2.55
+Window Geometry:
+  Width: 1550
+  Height: 960

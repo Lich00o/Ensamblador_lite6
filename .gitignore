@@ -1,0 +1,26 @@
+# colcon
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Claude Code (permisos locales de esta máquina)
+.claude/settings.local.json
+
+# docker/data: se versionan scripts (sim_scripts/, webapp), calibraciones (*.yaml, *.npz),
+# jtc_streaming.yaml y models/README.md. Fuera: grabaciones, modelos y capturas.
+docker/data/diag/
+docker/data/reid_dump/
+docker/data/person_usd/
+docker/data/models/*.onnx
+docker/data/.live_cam.jpg
+docker/data/*.jpg
+docker/data/*.png
+
+# Mallas/texturas convertidas de un asset USD de terceros (male_adult_construction_01): no redistribuir.
+# Se regeneran con lite6_handeye/usd_person.py a partir del USD original.
+src/lite6_handeye/sim/models/person_target/meshes/

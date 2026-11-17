@@ -1,0 +1,106 @@
+# Parámetros de lite6_handeye. Tópicos/frames de cámara: lite6_handeye/presets.py
+# (los launch los inyectan según camera:=zed|orbbec).
+
+/**:
+  ros__parameters:
+    # ChArUco — ESCRIBIR AQUÍ LAS MEDIDAS REALES post-grabado (calibrador vernier), en metros.
+    board.squares_x: 5
+    board.squares_y: 7          # impar (compatibilidad OpenCV 4.6 / >= 4.7)
+    board.square_length: 0.030
+    board.marker_length: 0.022
+    board.dictionary: DICT_4X4_50
+
+charuco_detector:
+  ros__parameters:
+    board_frame: charuco_board
+    min_corners: 8
+    max_reproj_rmse_px: 1.0
+    publish_tf: true
+    publish_debug_image: true
+
+handeye_auto_calibrator:
+  ros__parameters:
+    name: lite6_zed_calib
+    output_dir: ~/.ros/lite6_handeye
+    robot_base_frame: link_base
+    robot_effector_frame: link_eef
+    move_group: lite6
+    velocity_scaling: 0.1
+    acceleration_scaling: 0.1
+    planning_time: 5.0
+    n_poses: 25                 # 15–25
+    distance_min: 0.22          # m cámara -> centro del tablero (alcance Lite 6: 440 mm)
+    distance_max: 0.32
+    tilt_min_deg: 20.0
+    tilt_max_deg: 45.0
+    roll_max_deg: 45.0          # giro alrededor del eje óptico (diversidad de ejes de rotación)
+    azimuth_range_deg: 100.0    # +- acimut alrededor de la dirección tablero->base (180 = 360°)
+    wrist_window_deg: 170.0     # joint4/joint6 a +- de la pose inicial (cable de la cámara); partir con J6 ~0
+    follow_azimuth: true        # el "arriba" de la cámara gira con el acimut (menos giro de joint6)
+    min_eef_height: 0.15        # m; prefiltro: link_eef sobre la mesa
+    settle_time: 1.0            # s tras cada movimiento (vibraciones)
+    samples_per_pose: 10
+    max_sample_spread_mm: 2.0   # máx. desviación entre detecciones en una pose
+    min_samples: 10
+    method: refine              # park | refine
+    # Estimación CAD de link_eef -> frame óptico (solo para generar poses).
+    # [x y z roll pitch yaw] (m, rad). Del CAD del soporte Astra Pro Plus (~/Work/adaptador_orbbec):
+    # lente RGB en (12.5, -70, ~42) mm del flange, mirando +z. yaw = pi supone la bisagra/USB de la
+    # cámara hacia -y (lado opuesto al disco): imagen "abajo" = -y de link_eef.
+    x_prior_xyz_rpy: [0.0125, -0.070, 0.042, 0.0, 0.0, 3.14159265]
+    # Simulación sin cámara: pose supuesta del tablero (origen = esquina) en link_base [x y z r p y].
+    # [0.225, 0.105, 0, pi, 0, 0] deja el centro del tablero 5x7x30mm en (0.30, 0.0).
+    use_board_pose_base: false
+    board_pose_base: [0.225, 0.105, 0.0, 3.14159265, 0.0, 0.0]
+    table.add: true
+    table.z: 0.0                # superficie de la mesa en link_base
+    table.center_x: 0.3
+    table.center_y: 0.0
+    table.size_x: 1.2
+    table.size_y: 1.2
+    table.thickness: 0.05
+
+person_tracker:
+  ros__parameters:
+    robot_base_frame: link_base
+    robot_effector_frame: link_eef
+    calibration_file: ~/.ros/lite6_handeye/lite6_zed_calib.yaml
+    x_prior_xyz_rpy: [0.0125, -0.070, 0.042, 0.0, 0.0, 3.14159265]
+    ref_torso_height_m: 0.52
+    kf_accel_std: 0.1           # Kalman CV: aceleración de la persona (m/s^2); menor = más suave (afinado 2026-11-16)
+    kf_meas_lat_std: 0.05       # ruido de medición perpendicular al rayo (m)
+    kf_meas_depth_std: 0.6      # ruido a lo largo del rayo (m; la distancia por bbox salta hasta 1.4 m)
+    kf_gate_sigma: 3.5          # descarta saltos > N sigma (falsas detecciones)
+    kf_max_rejects: 5           # descartes seguidos antes de reiniciar el filtro
+    cam_radius_nom: 0.30
+    cam_radius_gain: 0.0        # 0: el TCP no se traslada con la distancia estimada (ruidosa), solo apunta
+    cam_z_nom: 0.38
+    cam_z_gain: 0.0             # 0: ídem con la altura de la persona
+    max_azimuth_deg: 170.0      # acimut de la cámara (J1 gira hacia la persona; límite J1 ±178°)
+    cam_radius_range_m: [0.24, 0.34]  # radio xy permitido de la cámara (pt_real.sh lo centra en su pose)
+    cam_z_range_m: [0.28, 0.46]       # altura permitida de la cámara
+    control_period: 0.08
+    max_joint_vel_rad_s: 1.80   # pt_real.sh lo baja (0.3-0.5)
+    max_joint_acc_rad_s2: 0.8   # suavizado Ruckig: aceleración máx. por articulación (menos excitación de la muñeca)
+    max_joint_jerk_rad_s3: 8.0  # suavizado Ruckig: jerk máx. (menor = más suave)
+    smooth_motion: true         # referencia continua a stream_rate_hz (false = un punto por meta)
+    stream_rate_hz: 50.0
+    stream_lookahead_s: 0.10    # 0.15 probado en el robot: vibración x3, J1 a 135 °/s
+    image_latency_s: 0.03       # captura -> stamp; 0.08 probado A/B en el robot: sin mejora
+    min_move_time: 0.14
+    joint_deadband_rad: 0.03    # ~1.7°: no corrige temblores menores
+    deadband_enter_deg: 5.0     # quieto mientras la cabeza esté a < 5° del eje óptico
+    deadband_exit_deg: 2.0      # al salir de la zona, recentra hasta < 2° (histéresis)
+    id_tracking: true           # ByteTrack: ID por persona, se sigue solo el objetivo elegido
+    auto_select_target: false   # true = sin objetivo, tomar la persona más cercana
+    track_high_thresh: 0.5      # ByteTrack: puntaje 'alto' (1.ª asociación)
+    track_low_thresh: 0.15      # ByteTrack: puntaje 'bajo' (2.ª asociación, oclusiones parciales)
+    track_buffer_s: 3.0         # ByteTrack: cuánto se conserva un ID perdido
+    reid_enabled: true          # galería de IDs: quien sale de cuadro vuelve con su mismo ID (apariencia)
+    reid_buffer_s: 120.0        # cuánto recuerda la galería un ID expirado
+    reid_model: ~/.ros/lite6_handeye/models/osnet_ain_x1_0_msmt17.onnx  # ReID (HF mprib/osnet-ain-x1-0-msmt17-onnx)
+    reid_thresh: 0.8            # similitud coseno mínima; con 0.6 fusionó a dos personas (0.72). Sin validar al volver
+    tracker_cmc: true           # compensa el giro de la cámara (cinemática) antes de asociar IDs
+    max_wrist_jump_deg: 25.0    # descarta IK que gire J4 o J6 más (cambio de rama de muñeca)
+    lost_timeout: 5.0
+    publish_debug_image: true

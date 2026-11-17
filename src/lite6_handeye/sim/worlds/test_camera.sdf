@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!-- Mundo de prueba: tablero + cámara fija mirando hacia abajo (sin robot). -->
+<sdf version="1.9">
+  <world name="test">
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors"><render_engine>ogre2</render_engine></plugin>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <light type="directional" name="sun"><pose>0 0 3 0 0 0</pose><diffuse>0.9 0.9 0.9 1</diffuse><direction>-0.3 0.2 -1</direction><cast_shadows>false</cast_shadows></light>
+    <scene><ambient>0.5 0.5 0.5 1</ambient><background>0.7 0.7 0.7 1</background></scene>
+    <include><uri>model://charuco_board</uri><pose>0.30 0 0.001 0 0 0</pose></include>
+    <model name="cam">
+      <static>true</static>
+      <!-- cámara gz mira a lo largo de +x del link: pitch 90° -> mira hacia -z -->
+      <pose>0.30 0 0.30 0 1.5708 0</pose>
+      <link name="link">
+        <sensor name="rgbd" type="rgbd_camera">
+          <gz_frame_id>test_optical</gz_frame_id>
+          <topic>test_cam</topic>
+          <update_rate>5</update_rate>
+          <camera><horizontal_fov>1.5</horizontal_fov><image><width>1280</width><height>720</height><format>R8G8B8</format></image>
+            <clip><near>0.05</near><far>3</far></clip></camera>
+        </sensor>
+      </link>
+    </model>
+  </world>
+</sdf>

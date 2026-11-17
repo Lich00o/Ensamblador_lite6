@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!-- Mundo de calibración: link_base del Lite 6 en el origen, superficie de la mesa en z = 0.
+     Tablero ChArUco centrado en (0.30, 0) (= board_pose_base [0.225, 0.105, 0, pi, 0, 0]).
+     Gravedad 0 (igual que xarm_gazebo: control de posición). -->
+<sdf version="1.9">
+  <world name="handeye">
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+    <gravity>0 0 0</gravity>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <scene>
+      <ambient>0.55 0.55 0.55 1</ambient>
+      <background>0.75 0.78 0.82 1</background>
+      <shadows>false</shadows>
+    </scene>
+    <light type="directional" name="sun">
+      <pose>0 0 3 0 0 0</pose>
+      <diffuse>0.85 0.85 0.85 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <direction>-0.4 0.3 -1</direction>
+      <cast_shadows>false</cast_shadows>
+    </light>
+
+    <model name="ground">
+      <static>true</static>
+      <pose>0 0 -0.75 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><plane><normal>0 0 1</normal><size>10 10</size></plane></geometry></collision>
+        <visual name="v"><geometry><plane><normal>0 0 1</normal><size>10 10</size></plane></geometry>
+          <material><diffuse>0.5 0.5 0.5 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="table">
+      <static>true</static>
+      <pose>0.3 0 -0.025 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.2 1.2 0.05</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.2 1.2 0.05</size></box></geometry>
+          <material><diffuse>0.62 0.52 0.40 1</diffuse><specular>0.05 0.05 0.05 1</specular></material></visual>
+      </link>
+    </model>
+
+    <include>
+      <uri>model://charuco_board</uri>
+      <name>charuco_board</name>
+      <pose>0.30 0 0.0015 0 0 0</pose>
+    </include>
+
+    <!-- Persona frente a la mesa para pruebas de seguimiento 6-DOF -->
+    <include>
+      <uri>model://person_target</uri>
+      <name>person_target</name>
+      <pose>1.35 0 0 0 0 0</pose>
+    </include>
+  </world>
+</sdf>

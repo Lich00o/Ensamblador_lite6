@@ -1,0 +1,20 @@
+repositories:
+  # Driver + MoveIt del Lite 6 (tiene submódulo: usar vcs import --recursive)
+  xarm_ros2:
+    type: git
+    url: https://github.com/xArm-Developer/xarm_ros2.git
+    version: jazzy
+  # Alternativa GUI de calibración (opcional)
+  easy_handeye2:
+    type: git
+    url: https://github.com/marcoesposito1988/easy_handeye2.git
+    version: master
+  # Cámaras: dejar solo la que se use (ZED requiere ZED SDK + CUDA instalados)
+  zed-ros2-wrapper:
+    type: git
+    url: https://github.com/stereolabs/zed-ros2-wrapper.git
+    version: master
+  OrbbecSDK_ROS2:
+    type: git
+    url: https://github.com/orbbec/OrbbecSDK_ROS2.git
+    version: v2-main

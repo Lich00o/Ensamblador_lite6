@@ -1,0 +1,23 @@
+# lite6_handeye — 2026-11-09T20:50:01
+name: lite6_zed_calib
+created: '2026-11-09T20:50:01'
+calibration_type: eye_in_hand
+method: refine
+frames: {robot_base_frame: link_base, robot_effector_frame: link_eef, camera_root_frame: sim_camera_link, optical_frame: sim_camera_optical_frame}
+eef_to_optical:
+  translation: {x: 0.007964461762290176, y: -0.06503019491746188, z: 0.04598506788182406}
+  rotation: {x: 0.018339386477453295, y: -0.025316463853450356, z: 0.03529809213655758, w: 0.9988877756050009}
+publish:
+  parent_frame: link_eef
+  child_frame: sim_camera_link
+  translation: {x: 0.007964461762290176, y: -0.06503019491746188, z: 0.04598506788182406}
+  rotation: {x: 0.5136043951827807, y: -0.5036227668996733, z: 0.5205814725587777, w: 0.4599669165687699}
+metrics: {n_samples: 13, trans_rms_mm: 0.027590820036704183, trans_max_mm: 0.04692010262811097, rot_rms_deg: 0.01872396140872194,
+  rot_max_deg: 0.039060136783518266}
+per_sample_trans_mm: [0.01863257938640695, 0.016508928447896008, 0.04692010262811097, 0.020915469456209947, 0.041895568539238495,
+  0.014018086657492245, 0.04132189181674433, 0.013110811687377202, 0.024514420572697582, 0.038793452919443104, 0.005023955233666504,
+  0.0213532955674898, 0.014811928341257432]
+samples_used: [0, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14]
+n_samples_total: 16
+static_transform_publisher: ros2 run tf2_ros static_transform_publisher --x 0.007964 --y -0.065030 --z 0.045985 --qx 0.513604
+  --qy -0.503623 --qz 0.520581 --qw 0.459967 --frame-id link_eef --child-frame-id sim_camera_link

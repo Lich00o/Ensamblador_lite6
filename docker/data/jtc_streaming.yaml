@@ -1,0 +1,3 @@
+lite6_traj_controller:
+  ros__parameters:
+    interpolate_from_desired_state: true

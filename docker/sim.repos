@@ -1,0 +1,10 @@
+# Dependencias para simulación (sin drivers de cámara reales).
+repositories:
+  xarm_ros2:
+    type: git
+    url: https://github.com/xArm-Developer/xarm_ros2.git
+    version: jazzy
+  easy_handeye2:
+    type: git
+    url: https://github.com/marcoesposito1988/easy_handeye2.git
+    version: master

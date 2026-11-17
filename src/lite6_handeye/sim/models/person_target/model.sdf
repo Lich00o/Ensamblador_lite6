@@ -1,0 +1,916 @@
+<?xml version="1.0"?>
+<!-- Generado automáticamente desde USD: male_adult_construction_01.usd
+     Rig humanoide cinemático completo (13 eslabones, 16 GDL a 1000 Hz):
+     - Base 4-DOF: px, py, pz, yaw (pelvis)
+     - Tronco y cabeza: pitch (torso_link), head_yaw (head_link)
+     - Brazos (hombro + codo): arm_l, elbow_l, arm_r, elbow_r
+     - Piernas (cadera + rodilla + tobillo): leg_l, knee_l, ankle_l, leg_r, knee_r, ankle_r -->
+<sdf version="1.9">
+  <model name="person_target">
+    <static>false</static>
+
+    <joint name="world_fixed" type="fixed">
+      <parent>world</parent>
+      <child>anchor</child>
+    </joint>
+
+    <link name="anchor">
+      <gravity>false</gravity>
+      <inertial><mass>1.0</mass><inertia><ixx>0.01</ixx><iyy>0.01</iyy><izz>0.01</izz></inertia></inertial>
+    </link>
+
+    <link name="stage_x">
+      <gravity>false</gravity>
+      <inertial><mass>0.5</mass><inertia><ixx>0.005</ixx><iyy>0.005</iyy><izz>0.005</izz></inertia></inertial>
+    </link>
+    <joint name="px" type="prismatic">
+      <parent>anchor</parent>
+      <child>stage_x</child>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit><lower>-0.50</lower><upper>0.50</upper><effort>500</effort><velocity>3.0</velocity></limit>
+      </axis>
+    </joint>
+
+    <link name="stage_y">
+      <gravity>false</gravity>
+      <inertial><mass>0.5</mass><inertia><ixx>0.005</ixx><iyy>0.005</iyy><izz>0.005</izz></inertia></inertial>
+    </link>
+    <joint name="py" type="prismatic">
+      <parent>stage_x</parent>
+      <child>stage_y</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-0.75</lower><upper>0.75</upper><effort>500</effort><velocity>3.0</velocity></limit>
+      </axis>
+    </joint>
+
+    <link name="stage_z">
+      <gravity>false</gravity>
+      <inertial><mass>0.5</mass><inertia><ixx>0.005</ixx><iyy>0.005</iyy><izz>0.005</izz></inertia></inertial>
+    </link>
+    <joint name="pz" type="prismatic">
+      <parent>stage_y</parent>
+      <child>stage_z</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit><lower>-0.45</lower><upper>0.50</upper><effort>500</effort><velocity>4.0</velocity></limit>
+      </axis>
+    </joint>
+
+    <link name="pelvis">
+      <gravity>false</gravity>
+      <pose>0.0000 0.0000 0.0000 0 0 0</pose>
+      <inertial><mass>1.0</mass><inertia><ixx>0.01</ixx><iyy>0.01</iyy><izz>0.01</izz></inertia></inertial>
+      <visual name="pelvis_usd_0">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_pelvis_8.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__fabric__workpants_20_27_38.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <visual name="pelvis_usd_1">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_pelvis_18.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__fabric__tshirt_22_34_52.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+    <joint name="yaw" type="revolute">
+      <parent>stage_z</parent>
+      <child>pelvis</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit><lower>-1.57</lower><upper>1.57</upper><effort>200</effort><velocity>5.0</velocity></limit>
+      </axis>
+    </joint>
+
+    <link name="torso_link">
+      <gravity>false</gravity>
+      <pose>0.0154 -0.0002 -0.0382 0 0 0</pose>
+      <inertial><mass>2.0</mass><inertia><ixx>0.02</ixx><iyy>0.02</iyy><izz>0.02</izz></inertia></inertial>
+      <visual name="torso_link_usd_0">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_torso_link_0.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__organic__whitemaleskin_100_100_100.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <visual name="torso_link_usd_1">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_torso_link_6.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__fabric__vest_16_42_82.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <visual name="torso_link_usd_2">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_torso_link_9.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__fabric__workpants_20_27_38.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <visual name="torso_link_usd_3">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_torso_link_19.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__fabric__tshirt_22_34_52.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <visual name="torso_link_usd_4">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_torso_link_25.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_retro__reflective__vest_90_94_82.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+    <joint name="pitch" type="revolute">
+      <parent>pelvis</parent>
+      <child>torso_link</child>
+      <pose>0 0 0 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-0.65</lower><upper>0.65</upper><effort>200</effort><velocity>6.0</velocity></limit>
+      </axis>
+    </joint>
+
+    <link name="head_link">
+      <gravity>false</gravity>
+      <pose>0.0498 -0.0003 0.3767 0 0 0</pose>
+      <inertial><mass>0.4</mass><inertia><ixx>0.003</ixx><iyy>0.003</iyy><izz>0.003</izz></inertia></inertial>
+      <visual name="head_link_usd_0">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_head_link_1.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__organic__whitemaleskin_100_100_100.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <visual name="head_link_usd_1">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_head_link_7.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__plastic__hardhat_95_75_10.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <visual name="head_link_usd_2">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_head_link_20.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__fabric__tshirt_22_34_52.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+    <joint name="head_yaw" type="revolute">
+      <parent>torso_link</parent>
+      <child>head_link</child>
+      <pose>0 0 0 0 0 0</pose>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit><lower>-1.3</lower><upper>1.3</upper><effort>100</effort><velocity>8.0</velocity></limit>
+      </axis>
+    </joint>
+
+    <link name="arm_l_link">
+      <gravity>false</gravity>
+      <pose>0.0776 0.1673 0.3159 0 0 0</pose>
+      <inertial><mass>0.25</mass><inertia><ixx>0.002</ixx><iyy>0.002</iyy><izz>0.002</izz></inertia></inertial>
+      <visual name="arm_l_link_usd_0">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_arm_l_link_2.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__organic__whitemaleskin_100_100_100.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <visual name="arm_l_link_usd_1">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_arm_l_link_21.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__fabric__tshirt_22_34_52.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+    <joint name="arm_l" type="revolute">
+      <parent>torso_link</parent>
+      <child>arm_l_link</child>
+      <pose>0 0 0 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-1.8</lower><upper>2.9</upper><effort>100</effort><velocity>10.0</velocity></limit>
+      </axis>
+    </joint>
+
+    <link name="forearm_l_link">
+      <gravity>false</gravity>
+      <pose>0.0788 0.2253 0.0800 0 0 0</pose>
+      <inertial><mass>0.20</mass><inertia><ixx>0.001</ixx><iyy>0.001</iyy><izz>0.001</izz></inertia></inertial>
+      <visual name="forearm_l_link_usd_0">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_forearm_l_link_3.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__organic__whitemaleskin_100_100_100.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <visual name="forearm_l_link_usd_1">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_forearm_l_link_16.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__leather__gloves_34_32_28.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+    <joint name="elbow_l" type="revolute">
+      <parent>arm_l_link</parent>
+      <child>forearm_l_link</child>
+      <pose>0 0 0 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-0.3</lower><upper>2.4</upper><effort>100</effort><velocity>10.0</velocity></limit>
+      </axis>
+    </joint>
+
+    <link name="arm_r_link">
+      <gravity>false</gravity>
+      <pose>0.0776 -0.1674 0.3164 0 0 0</pose>
+      <inertial><mass>0.25</mass><inertia><ixx>0.002</ixx><iyy>0.002</iyy><izz>0.002</izz></inertia></inertial>
+      <visual name="arm_r_link_usd_0">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_arm_r_link_4.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__organic__whitemaleskin_100_100_100.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <visual name="arm_r_link_usd_1">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_arm_r_link_22.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__fabric__tshirt_22_34_52.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+    <joint name="arm_r" type="revolute">
+      <parent>torso_link</parent>
+      <child>arm_r_link</child>
+      <pose>0 0 0 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-1.8</lower><upper>2.9</upper><effort>100</effort><velocity>10.0</velocity></limit>
+      </axis>
+    </joint>
+
+    <link name="forearm_r_link">
+      <gravity>false</gravity>
+      <pose>0.0788 -0.2249 0.0810 0 0 0</pose>
+      <inertial><mass>0.20</mass><inertia><ixx>0.001</ixx><iyy>0.001</iyy><izz>0.001</izz></inertia></inertial>
+      <visual name="forearm_r_link_usd_0">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_forearm_r_link_5.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__organic__whitemaleskin_100_100_100.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <visual name="forearm_r_link_usd_1">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_forearm_r_link_17.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__leather__gloves_34_32_28.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+    <joint name="elbow_r" type="revolute">
+      <parent>arm_r_link</parent>
+      <child>forearm_r_link</child>
+      <pose>0 0 0 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-0.3</lower><upper>2.4</upper><effort>100</effort><velocity>10.0</velocity></limit>
+      </axis>
+    </joint>
+
+    <link name="leg_l_link">
+      <gravity>false</gravity>
+      <pose>0.0206 0.0844 -0.1147 0 0 0</pose>
+      <inertial><mass>0.4</mass><inertia><ixx>0.003</ixx><iyy>0.003</iyy><izz>0.003</izz></inertia></inertial>
+      <visual name="leg_l_link_usd_0">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_leg_l_link_10.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__fabric__workpants_20_27_38.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <visual name="leg_l_link_usd_1">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_leg_l_link_23.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__fabric__tshirt_22_34_52.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+    <joint name="leg_l" type="revolute">
+      <parent>pelvis</parent>
+      <child>leg_l_link</child>
+      <pose>0 0 0 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-1.6</lower><upper>1.8</upper><effort>200</effort><velocity>10.0</velocity></limit>
+      </axis>
+    </joint>
+
+    <link name="calf_l_link">
+      <gravity>false</gravity>
+      <pose>0.0262 0.0797 -0.5041 0 0 0</pose>
+      <inertial><mass>0.3</mass><inertia><ixx>0.002</ixx><iyy>0.002</iyy><izz>0.002</izz></inertia></inertial>
+      <visual name="calf_l_link_usd_0">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_calf_l_link_11.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__fabric__workpants_20_27_38.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <visual name="calf_l_link_usd_1">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_calf_l_link_26.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_retro__reflective__pants_90_94_82.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+    <joint name="knee_l" type="revolute">
+      <parent>leg_l_link</parent>
+      <child>calf_l_link</child>
+      <pose>0 0 0 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-2.3</lower><upper>0.2</upper><effort>200</effort><velocity>10.0</velocity></limit>
+      </axis>
+    </joint>
+
+    <link name="foot_l_link">
+      <gravity>false</gravity>
+      <pose>0.0389 0.0747 -0.8976 0 0 0</pose>
+      <inertial><mass>0.2</mass><inertia><ixx>0.001</ixx><iyy>0.001</iyy><izz>0.001</izz></inertia></inertial>
+      <visual name="foot_l_link_usd_0">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_foot_l_link_14.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__leather__boots_42_28_16.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+    <joint name="ankle_l" type="revolute">
+      <parent>calf_l_link</parent>
+      <child>foot_l_link</child>
+      <pose>0 0 0 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-1.2</lower><upper>1.2</upper><effort>150</effort><velocity>10.0</velocity></limit>
+      </axis>
+    </joint>
+
+    <link name="leg_r_link">
+      <gravity>false</gravity>
+      <pose>0.0208 -0.0848 -0.1148 0 0 0</pose>
+      <inertial><mass>0.4</mass><inertia><ixx>0.003</ixx><iyy>0.003</iyy><izz>0.003</izz></inertia></inertial>
+      <visual name="leg_r_link_usd_0">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_leg_r_link_12.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__fabric__workpants_20_27_38.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <visual name="leg_r_link_usd_1">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_leg_r_link_24.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__fabric__tshirt_22_34_52.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+    <joint name="leg_r" type="revolute">
+      <parent>pelvis</parent>
+      <child>leg_r_link</child>
+      <pose>0 0 0 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-1.6</lower><upper>1.8</upper><effort>200</effort><velocity>10.0</velocity></limit>
+      </axis>
+    </joint>
+
+    <link name="calf_r_link">
+      <gravity>false</gravity>
+      <pose>0.0253 -0.0796 -0.5041 0 0 0</pose>
+      <inertial><mass>0.3</mass><inertia><ixx>0.002</ixx><iyy>0.002</iyy><izz>0.002</izz></inertia></inertial>
+      <visual name="calf_r_link_usd_0">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_calf_r_link_13.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__fabric__workpants_20_27_38.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+      <visual name="calf_r_link_usd_1">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_calf_r_link_27.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_retro__reflective__pants_90_94_82.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+    <joint name="knee_r" type="revolute">
+      <parent>leg_r_link</parent>
+      <child>calf_r_link</child>
+      <pose>0 0 0 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-2.3</lower><upper>0.2</upper><effort>200</effort><velocity>10.0</velocity></limit>
+      </axis>
+    </joint>
+
+    <link name="foot_r_link">
+      <gravity>false</gravity>
+      <pose>0.0370 -0.0743 -0.8977 0 0 0</pose>
+      <inertial><mass>0.2</mass><inertia><ixx>0.001</ixx><iyy>0.001</iyy><izz>0.001</izz></inertia></inertial>
+      <visual name="foot_r_link_usd_0">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://person_target/meshes/usd_foot_r_link_15.obj</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0 1</diffuse>
+          <specular>0.1200 0.1200 0.1200 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://person_target/meshes/tex_male_adult_construction_01_BaseColor_opaque__leather__boots_42_28_16.png</albedo_map>
+              <roughness>0.650</roughness>
+              <metalness>0.0</metalness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+    <joint name="ankle_r" type="revolute">
+      <parent>calf_r_link</parent>
+      <child>foot_r_link</child>
+      <pose>0 0 0 0 0 0</pose>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit><lower>-1.2</lower><upper>1.2</upper><effort>150</effort><velocity>10.0</velocity></limit>
+      </axis>
+    </joint>
+
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+      <joint_name>px</joint_name>
+      <topic>/person_target/px</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <cmd_max>3.0</cmd_max>
+      <cmd_min>-3.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+      <joint_name>py</joint_name>
+      <topic>/person_target/py</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <cmd_max>3.0</cmd_max>
+      <cmd_min>-3.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+      <joint_name>pz</joint_name>
+      <topic>/person_target/pz</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <cmd_max>4.0</cmd_max>
+      <cmd_min>-4.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+      <joint_name>yaw</joint_name>
+      <topic>/person_target/yaw</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <cmd_max>10.0</cmd_max>
+      <cmd_min>-10.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+      <joint_name>pitch</joint_name>
+      <topic>/person_target/pitch</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <cmd_max>10.0</cmd_max>
+      <cmd_min>-10.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+      <joint_name>head_yaw</joint_name>
+      <topic>/person_target/head_yaw</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <cmd_max>10.0</cmd_max>
+      <cmd_min>-10.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+      <joint_name>arm_l</joint_name>
+      <topic>/person_target/arm_l</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <cmd_max>10.0</cmd_max>
+      <cmd_min>-10.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+      <joint_name>elbow_l</joint_name>
+      <topic>/person_target/elbow_l</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <cmd_max>10.0</cmd_max>
+      <cmd_min>-10.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+      <joint_name>arm_r</joint_name>
+      <topic>/person_target/arm_r</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <cmd_max>10.0</cmd_max>
+      <cmd_min>-10.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+      <joint_name>elbow_r</joint_name>
+      <topic>/person_target/elbow_r</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <cmd_max>10.0</cmd_max>
+      <cmd_min>-10.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+      <joint_name>leg_l</joint_name>
+      <topic>/person_target/leg_l</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <cmd_max>10.0</cmd_max>
+      <cmd_min>-10.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+      <joint_name>knee_l</joint_name>
+      <topic>/person_target/knee_l</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <cmd_max>10.0</cmd_max>
+      <cmd_min>-10.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+      <joint_name>ankle_l</joint_name>
+      <topic>/person_target/ankle_l</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <cmd_max>10.0</cmd_max>
+      <cmd_min>-10.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+      <joint_name>leg_r</joint_name>
+      <topic>/person_target/leg_r</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <cmd_max>10.0</cmd_max>
+      <cmd_min>-10.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+      <joint_name>knee_r</joint_name>
+      <topic>/person_target/knee_r</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <cmd_max>10.0</cmd_max>
+      <cmd_min>-10.0</cmd_min>
+    </plugin>
+    <plugin filename="gz-sim-joint-position-controller-system"
+            name="gz::sim::systems::JointPositionController">
+      <joint_name>ankle_r</joint_name>
+      <topic>/person_target/ankle_r</topic>
+      <use_velocity_commands>true</use_velocity_commands>
+      <cmd_max>10.0</cmd_max>
+      <cmd_min>-10.0</cmd_min>
+    </plugin>
+  </model>
+</sdf>

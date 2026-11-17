@@ -1,0 +1,8 @@
+# lite6_handeye — 2026-11-16T13:22:16
+frames: {robot_effector_frame: link_eef, camera_root_frame: sim_camera_link, optical_frame: sim_camera_optical_frame}
+eef_to_optical:
+  translation: {x: 0.004500000017948966, y: -0.06499999997128167, z: 0.048}
+  rotation: {x: 0.025365034217428164, y: 0.018392051308845817, z: 0.9988808938822913, w: -0.035430316463677336}
+eef_to_camera_root:
+  translation: {x: 0.004500000017948966, y: -0.06499999997128167, z: 0.048}
+  rotation: {x: -0.5036038314724438, y: -0.5136691137186932, z: -0.45984674594617014, w: 0.5206420966272755}

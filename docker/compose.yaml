@@ -1,0 +1,60 @@
+# Uso (desde la raíz del repo):
+#   docker compose -f docker/compose.yaml build
+#   docker compose -f docker/compose.yaml run --rm sim            # GPU AMD/Intel (/dev/dri)
+#   docker compose -f docker/compose.yaml run --rm sim-nvidia     # GPU NVIDIA (PRIME offload)
+# GUI vía XWayland (si falla 'cannot open display': xhost +SI:localuser:$USER)
+
+x-common: &common
+  image: lite6_zed:jazzy
+  network_mode: host
+  ipc: host
+  stdin_open: true
+  tty: true
+  environment:
+    DISPLAY: ${DISPLAY:-:0}
+    QT_QPA_PLATFORM: xcb
+    ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-42}
+    ROS_AUTOMATIC_DISCOVERY_RANGE: LOCALHOST
+  volumes:
+    - ../src/lite6_handeye:/ws/src/lite6_handeye
+    - ../boards:/ws/boards:ro
+    - ./data:/home/ubuntu/.ros/lite6_handeye
+    - /tmp/.X11-unix:/tmp/.X11-unix:rw
+
+services:
+  sim:
+    <<: *common
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    devices:
+      - /dev/dri:/dev/dri
+    group_add:            # GIDs del host: video y render (stat -c %g /dev/dri/*)
+      - "${VIDEO_GID:-983}"
+      - "${RENDER_GID:-987}"
+
+  # Simulador del controlador UFactory (firmware + UFACTORY Studio), Lite 6 = "6 9".
+  # docs: https://docs.supportarticle.ufactory.cc/support_articles/software/how-to-install-ufactory-studio-in-docker.html
+  #   docker compose -f docker/compose.yaml up -d uf-sim
+  #   Studio: http://127.0.0.1:18333   driver/SDK: robot_ip:=127.0.0.1
+  # Red host: usa los puertos 502-504, 18333, 30000-30003 del host.
+  uf-sim:
+    image: danielwang123321/uf-ubuntu-docker:latest
+    container_name: uf_sim_lite6
+    network_mode: host
+    stdin_open: true
+    tty: true            # xarm_start.sh termina en /bin/bash; sin tty el contenedor sale
+    command: ["/xarm_scripts/xarm_start.sh", "6", "9"]
+
+  sim-nvidia:
+    <<: *common
+    runtime: nvidia
+    environment:
+      DISPLAY: ${DISPLAY:-:0}
+      QT_QPA_PLATFORM: xcb
+      ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-42}
+      ROS_AUTOMATIC_DISCOVERY_RANGE: LOCALHOST
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all
+      __NV_PRIME_RENDER_OFFLOAD: "1"
+      __GLX_VENDOR_LIBRARY_NAME: nvidia

@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lite 6 Tracker</title>
+<style>
+  :root {
+    --bg: #14171c; --panel: #1d2128; --line: #2b313b; --text: #e6e9ee; --muted: #8b93a1;
+    --ok: #2fb36b; --warn: #e0a030; --bad: #e04848; --accent: #3d8bfd; --btn: #2a303a; --btn-h: #353d4a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, sans-serif; }
+  header { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+  header h1 { font-size: 16px; margin: 0; font-weight: 600; }
+  .pill { padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--btn); }
+  .pill.ok { background: rgba(47,179,107,.18); color: var(--ok); }
+  .pill.bad { background: rgba(224,72,72,.18); color: var(--bad); }
+  .pill.warn { background: rgba(224,160,48,.18); color: var(--warn); }
+  header .spacer { flex: 1; }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 16px; padding: 16px; }
+  @media (max-width: 1100px) { main { grid-template-columns: 1fr; } }
+  .video { background: #000; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; position: relative; }
+  .video img { display: block; width: 100%; height: auto; cursor: crosshair; }
+  .video .bar { display: flex; gap: 8px; padding: 8px; background: var(--panel); border-top: 1px solid var(--line); align-items: center; }
+  .video .hint { color: var(--muted); font-size: 12px; margin-left: auto; }
+  .col { display: flex; flex-direction: column; gap: 12px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+  .card h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px; }
+  button { background: var(--btn); color: var(--text); border: 1px solid var(--line); border-radius: 8px;
+           padding: 8px 10px; font: inherit; cursor: pointer; user-select: none; touch-action: none; }
+  button:hover { background: var(--btn-h); }
+  button.sel { outline: 2px solid var(--accent); }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  .big { width: 100%; padding: 14px; font-size: 17px; font-weight: 700; border: 0; }
+  .big.on { background: var(--ok); color: #06150c; }
+  .big.off { background: var(--warn); color: #1d1404; }
+  .row { display: flex; gap: 8px; margin-top: 8px; }
+  .row > * { flex: 1; }
+  .stop { background: var(--bad); color: #fff; border: 0; font-weight: 700; }
+  .ids { display: flex; flex-wrap: wrap; gap: 6px; min-height: 36px; align-items: center; }
+  .ids button.target { background: var(--bad); color: #fff; border-color: var(--bad); }
+  .muted { color: var(--muted); }
+  .jog { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .jog table { width: 100%; border-collapse: separate; border-spacing: 4px; }
+  .jog td:nth-child(2) { text-align: center; color: var(--muted); font-variant-numeric: tabular-nums; width: 46px; font-size: 12px; }
+  .jog button { width: 100%; padding: 8px 0; font-weight: 700; }
+  .jog button:active, .jog button.held { background: var(--accent); color: #fff; }
+  .slider { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .slider input { flex: 1; }
+  .kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-variant-numeric: tabular-nums; }
+  .kv span:nth-child(odd) { color: var(--muted); }
+  .msg { min-height: 20px; color: var(--warn); font-size: 13px; margin-top: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Lite 6 · seguimiento de personas</h1>
+  <span id="p-conn" class="pill bad">desconectado</span>
+  <span id="p-robot" class="pill">robot ?</span>
+  <span id="p-ctrl" class="pill">controlador ?</span>
+  <span class="spacer"></span>
+  <span id="p-fps" class="muted"></span>
+</header>
+<main>
+  <section>
+    <div class="video">
+      <img id="video" src="/stream.mjpg?src=debug" alt="cámara">
+      <div class="bar">
+        <button id="v-debug" class="sel">Tracker</button>
+        <button id="v-raw">Cámara</button>
+        <span class="hint">Clic sobre una persona para seguirla · clic fuera para soltar</span>
+      </div>
+    </div>
+    <div class="msg" id="msg"></div>
+  </section>
+
+  <div class="col">
+    <div class="card">
+      <h2>Seguimiento</h2>
+      <button id="b-track" class="big off">esperando tracker…</button>
+      <div class="row">
+        <button id="b-watch">Ir a vigilancia</button>
+        <button id="b-ready">Robot listo (mode 1)</button>
+      </div>
+      <div class="row"><button id="b-stop" class="stop">STOP</button></div>
+    </div>
+
+    <div class="card">
+      <h2>Objetivo</h2>
+      <div class="ids" id="ids"><span class="muted">nadie a la vista</span></div>
+      <div class="row">
+        <button id="b-near">Más cercana</button>
+        <button id="b-release">Soltar</button>
+      </div>
+      <div style="margin-top:8px" id="target" class="muted">Sin objetivo</div>
+    </div>
+
+    <div class="card">
+      <h2>Mover robot (mantener presionado)</h2>
+      <div class="slider"><span>Velocidad</span><input id="speed" type="range" min="5" max="100" step="5" value="25"><b id="speed-v">25%</b></div>
+      <div class="jog">
+        <table id="jog-j"></table>
+        <table id="jog-c"></table>
+      </div>
+      <div class="muted" style="font-size:12px;margin-top:6px">Al mover se pausa el seguimiento. Al soltar frena suave.</div>
+    </div>
+
+    <div class="card">
+      <h2>Estado</h2>
+      <div class="kv">
+        <span>Robot</span><span id="s-robot">—</span>
+        <span>Flange</span><span id="s-xyz">—</span>
+        <span>Orientación</span><span id="s-rpy">—</span>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+let ws, st = {}, src = 'debug';
+
+function connect() {
+  ws = new WebSocket(`ws://${location.host}/ws`);
+  ws.onopen = () => { $('p-conn').textContent = 'conectado'; $('p-conn').className = 'pill ok'; };
+  ws.onclose = () => { $('p-conn').textContent = 'desconectado'; $('p-conn').className = 'pill bad'; setTimeout(connect, 1000); };
+  ws.onmessage = e => { st = JSON.parse(e.data); render(); };
+}
+const send = o => ws && ws.readyState === 1 && ws.send(JSON.stringify(o));
+
+// --- video ---
+function setSrc(s) {
+  src = s;
+  $('video').src = `/stream.mjpg?src=${s}&t=${Date.now()}`;
+  $('v-debug').classList.toggle('sel', s === 'debug');
+  $('v-raw').classList.toggle('sel', s === 'raw');
+}
+$('v-debug').onclick = () => setSrc('debug');
+$('v-raw').onclick = () => setSrc('raw');
+$('video').addEventListener('click', e => {
+  if (src !== 'debug') return;
+  const r = e.target.getBoundingClientRect();
+  send({cmd: 'click', x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height});
+});
+
+// --- seguimiento ---
+$('b-track').onclick = () => st.tracking != null && send({cmd: 'tracking', on: !st.tracking});
+$('b-watch').onclick = () => send({cmd: 'watch'});
+$('b-ready').onclick = () => send({cmd: 'ready'});
+$('b-stop').onclick = () => send({cmd: 'stop'});
+$('b-near').onclick = () => send({cmd: 'select', id: -1});
+$('b-release').onclick = () => send({cmd: 'select', id: -2});
+
+// --- jog ---
+$('speed').oninput = e => { $('speed-v').textContent = e.target.value + '%'; send({cmd: 'speed', value: +e.target.value}); };
+let keep = null;
+function hold(btn, axis, sign) {
+  const start = e => {
+    e.preventDefault(); btn.setPointerCapture(e.pointerId); btn.classList.add('held');
+    send({cmd: 'jog', axis, sign});
+    clearInterval(keep); keep = setInterval(() => send({cmd: 'jog_keep'}), 100);
+  };
+  const stop = () => { btn.classList.remove('held'); clearInterval(keep); keep = null; send({cmd: 'jog_release'}); };
+  btn.addEventListener('pointerdown', start);
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => btn.addEventListener(ev, stop));
+}
+function jogTable(el, rows) {
+  rows.forEach(([label, axis], i) => {
+    const tr = el.insertRow();
+    const minus = document.createElement('button'); minus.textContent = '−';
+    const plus = document.createElement('button'); plus.textContent = '+';
+    tr.insertCell().append(minus);
+    const mid = tr.insertCell(); mid.innerHTML = `<b>${label}</b><br><span id="v-${axis}">—</span>`;
+    tr.insertCell().append(plus);
+    hold(minus, axis, -1); hold(plus, axis, 1);
+  });
+}
+jogTable($('jog-j'), [1, 2, 3, 4, 5, 6].map(i => [`J${i}`, `j${i}`]));
+jogTable($('jog-c'), [['X', 'x'], ['Y', 'y'], ['Z', 'z'], ['Rx', 'rx'], ['Ry', 'ry'], ['Rz', 'rz']]);
+window.addEventListener('blur', () => { if (keep) { clearInterval(keep); keep = null; send({cmd: 'jog_release'}); } });
+
+// --- render ---
+function pill(el, text, cls) { el.textContent = text; el.className = 'pill ' + cls; }
+function render() {
+  const t = $('b-track');
+  if (st.tracking == null) { t.textContent = 'esperando tracker…'; t.className = 'big off'; }
+  else if (st.tracking) { t.textContent = 'SEGUIMIENTO ON · pausar'; t.className = 'big on'; }
+  else { t.textContent = 'EN PAUSA · activar'; t.className = 'big off'; }
+
+  const r = st.robot;
+  if (!r) pill($('p-robot'), 'robot sin estado', 'bad');
+  else pill($('p-robot'), `robot mode ${r.mode} · state ${r.state} · err ${r.err}`, r.ok ? 'ok' : 'bad');
+  pill($('p-ctrl'), `controlador ${st.controller}`, st.controller === 'active' ? 'ok' : 'warn');
+  $('p-fps').textContent = st.fps ? `tracker ${st.fps.debug} fps · cámara ${st.fps.raw} fps` : '';
+  $('s-robot').textContent = r ? (r.ok ? 'listo' : 'NO LISTO: usa "Robot listo"') + (r.warn ? ` · warn ${r.warn}` : '') : '—';
+
+  const vis = (st.tracks || []).filter(x => x.visible);
+  const ids = $('ids');
+  const key = vis.map(x => x.id).join(',') + '|' + st.target + '|' + (st.gallery || []).join(',');
+  if (ids.dataset.key !== key) {
+    ids.dataset.key = key; ids.innerHTML = '';
+    if (!vis.length) ids.innerHTML = '<span class="muted">nadie a la vista</span>';
+    vis.forEach(x => {
+      const b = document.createElement('button');
+      b.textContent = `ID ${x.id}`; if (x.id === st.target) b.className = 'target';
+      b.onclick = () => send({cmd: 'select', id: x.id}); ids.append(b);
+    });
+    if ((st.gallery || []).length) {
+      const m = document.createElement('span'); m.className = 'muted';
+      m.textContent = ` · en memoria: ${st.gallery.map(i => 'ID ' + i).join(', ')}`; ids.append(m);
+    }
+  }
+  const lost = st.target != null && !vis.some(x => x.id === st.target);
+  $('target').textContent = st.target == null ? 'Sin objetivo: clic sobre una persona' : `Objetivo: ID ${st.target}${lost ? ((st.gallery || []).includes(st.target) ? ' (fuera de cuadro, en memoria)' : ' (PERDIDO)') : ''}`;
+  $('target').style.color = st.target == null ? '' : lost ? 'var(--bad)' : 'var(--ok)';
+
+  if (st.joints) st.joints.forEach((v, i) => { const e = $(`v-j${i + 1}`); if (e) e.textContent = v.toFixed(1) + '°'; });
+  if (st.tcp) {
+    ['x', 'y', 'z'].forEach((k, i) => $(`v-${k}`).textContent = st.tcp.xyz[i] + ' mm');
+    ['rx', 'ry', 'rz'].forEach((k, i) => $(`v-${k}`).textContent = st.tcp.rpy[i] + '°');
+    $('s-xyz').textContent = `x ${st.tcp.xyz[0]}  y ${st.tcp.xyz[1]}  z ${st.tcp.xyz[2]} mm`;
+    $('s-rpy').textContent = `rx ${st.tcp.rpy[0]}°  ry ${st.tcp.rpy[1]}°  rz ${st.tcp.rpy[2]}°`;
+  }
+  if (document.activeElement !== $('speed') && st.speed) { $('speed').value = st.speed; $('speed-v').textContent = st.speed + '%'; }
+  $('msg').textContent = st.msg || '';
+}
+connect();
+</script>
+</body>
+</html>
