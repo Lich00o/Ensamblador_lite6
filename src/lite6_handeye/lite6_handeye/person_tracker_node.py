@@ -138,6 +138,8 @@ class PersonTrackerNode(Node):
             ref_torso_height_m=self.P('ref_torso_height_m'),
             min_score=float(self.P('yolo_min_score')) if self.P('onnx_model') else 0.25,
         )
+        if self.detector.net is not None:
+            self.get_logger().info(f'Detector: {self.P("onnx_model")} ({self.detector.net_provider})')
         self.X_eef_opt = self._load_initial_calibration()
         self.tf_calibrated_logged = False
 

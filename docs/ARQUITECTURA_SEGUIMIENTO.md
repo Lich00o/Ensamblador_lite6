@@ -35,7 +35,7 @@ contenedores, el DDS pierde las imágenes y el `camera_info`.
 
 | Pieza | Qué hace |
 |---|---|
-| `docker/camera_bridge.sh` | `ffmpeg` lee la Orbbec por UVC (MJPEG 1280×720 a 30 fps) y reescribe `docker/data/.live_cam.jpg` en cada cuadro. Tiene que estar corriendo para que haya imagen. |
+| `docker/camera_bridge.sh` | `ffmpeg` lee la Orbbec por UVC (MJPEG 1280×720 a 30 fps) y reescribe `docker/data/.live_cam.jpg` en cada cuadro. Tiene que estar corriendo para que haya imagen. Si la cámara se desconecta del USB, espera a que vuelva y relanza `ffmpeg`. |
 | `docker/data/` | Montado en el contenedor como `~/.ros/lite6_handeye/`. Contiene la calibración, los modelos, los scripts (`sim_scripts/`) y los diagnósticos (`diag/`). |
 | Navegador | Abre la app web en `http://localhost:8080`. El contenedor usa la red del host (`network_mode: host`). |
 
@@ -50,7 +50,7 @@ con la imagen `lite6_zed:jazzy` y `runtime: nvidia`. La imagen ya trae `onnxrunt
 
 | Proceso | Lanzado por | Función |
 |---|---|---|
-| `bringup.launch.py` | `run_real_bringup.sh` | MoveIt + driver UFactory (`ros2_control`) + `orbbec_uvc` + TF de la calibración + detector ChArUco |
+| `bringup.launch.py` | `run_real_bringup.sh` | MoveIt + driver UFactory (`ros2_control`) + `orbbec_uvc` + TF de la calibración. El detector ChArUco solo arranca con `DETECTOR=true`, porque consume ~1 núcleo y solo sirve para calibrar |
 | `person_tracker` | `pt_real.sh` | El seguimiento (sección 3) |
 | `webapp/server.py` | `pt_real.sh` (si no hay otra instancia) | App web: video MJPEG, WebSocket de estado y comandos, jog |
 
@@ -230,6 +230,8 @@ docker exec -it lite6_gpu bash /home/ubuntu/.ros/lite6_handeye/sim_scripts/pt_re
 | Síntoma | Causa / solución |
 |---|---|
 | Sin imagen | `camera_bridge.sh` no está corriendo, o `/dev/video0` está ocupado por otro programa |
+| La cámara se cae seguido (`USB disconnect` en `journalctl -k`) | Cable o hub USB: conectar a un puerto directo del PC, usar un cable corto y de buena calidad, y sujetar el cable a lo largo del brazo para que no tire al moverse |
+| Seguimiento lento y `person_tracker` a más de 150 % de CPU | Revisar el log del tracker al arrancar: `Detector:` y `ReID:` deben decir `CUDAExecutionProvider` |
 | El brazo no se mueve y el video dice "SEGUIMIENTO PAUSA" o "Sin objetivo" | Elegir ID y activar seguimiento en la app web |
 | El robot no recibe comandos después de un error | El driver dejó `lite6_traj_controller` inactivo: usar **Robot listo** |
 | Movimiento a tirones, J4/J6 vibrando | El controlador perdió `interpolate_from_desired_state` (por ejemplo, se lanzó `bringup.launch.py` a mano): correr `jtc_streaming.sh` |

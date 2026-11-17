@@ -26,10 +26,12 @@ pkill -9 -f "[j]oint_state_publisher" 2>/dev/null || true
 sleep 2
 
 echo "=== Lanzando bringup.launch.py con Lite 6 real (192.168.1.153) + Cámara Orbbec ==="
+# DETECTOR=true activa charuco_detector (solo para calibrar: consume ~1 núcleo).
 # setsid: sesión propia, así un Ctrl+C en la terminal del tracker no mata el bringup
 nohup setsid ros2 launch lite6_handeye bringup.launch.py \
     robot_ip:=192.168.1.153 \
     camera:=orbbec \
+    start_detector:=${DETECTOR:-false} \
     calibration_file:=/home/ubuntu/.ros/lite6_handeye/lite6_zed_calib.yaml \
     > /tmp/real_bringup.log 2>&1 &
 
