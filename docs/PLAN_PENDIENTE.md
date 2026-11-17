@@ -400,4 +400,4 @@ Seguimiento de personas — vibración y afinado (2026-11-16):
 - **Ejecución del pick con ventosa** (planificar `pregrasp → grasp`, activar el vacío y levantar):
   `suction_grasp` hoy solo publica las poses. Requiere el control del vacío (`xarm_api`
   `set_vacuum_gripper` o salida digital) y una máquina de estados del pick.
-- Inicializar el repo git (el directorio aún no es un repositorio).
+- Repo git: `git@github.com:Lich00o/Ensamblador_lite6.git` (rama `main`, desde 2026-11-16).
