@@ -1,0 +1,123 @@
+[
+ {
+  "command": "file.insert_step",
+  "params": {
+   "path": "soporte_cuna.step"
+  }
+ },
+ {
+  "command": "body.rename",
+  "params": {
+   "body": "Open CASCADE STEP translator 7.9 1",
+   "name": "Cuna"
+  }
+ },
+ {
+  "command": "file.insert_step",
+  "params": {
+   "path": "soporte_tapa.step"
+  }
+ },
+ {
+  "command": "body.rename",
+  "params": {
+   "body": "Open CASCADE STEP translator 7.9 2",
+   "name": "Tapa"
+  }
+ },
+ {
+  "command": "file.insert_step",
+  "params": {
+   "path": "camara_posicionada.step"
+  }
+ },
+ {
+  "command": "file.insert_step",
+  "params": {
+   "path": "gripper_posicionado.step"
+  }
+ },
+ {
+  "command": "parts.insert",
+  "params": {
+   "family": "button_head_cap_screw",
+   "size": "M4",
+   "length": 12,
+   "at": [
+    [
+     52.25,
+     -49,
+     50
+    ],
+    [
+     -47.75,
+     -49,
+     50
+    ],
+    [
+     52.25,
+     -91,
+     50
+    ],
+    [
+     -47.75,
+     -91,
+     50
+    ]
+   ],
+   "name": "M4x12 ISO7380"
+  }
+ },
+ {
+  "command": "appearance.assign",
+  "params": {
+   "bodies": [
+    "Cuna"
+   ],
+   "color": "#3a7bd5"
+  }
+ },
+ {
+  "command": "appearance.assign",
+  "params": {
+   "bodies": [
+    "Tapa"
+   ],
+   "color": "#f28c28"
+  }
+ },
+ {
+  "command": "appearance.assign",
+  "params": {
+   "components": [
+    "camara_posicionada"
+   ],
+   "color": "#1e1e1e"
+  }
+ },
+ {
+  "command": "appearance.assign",
+  "params": {
+   "components": [
+    "gripper_posicionado"
+   ],
+   "color": "#9a9a9a"
+  }
+ },
+ {
+  "command": "view.save",
+  "params": {
+   "name": "Ensamble",
+   "camera": {
+    "target": [
+     0,
+     -40,
+     25
+    ],
+    "yaw": -2.4,
+    "pitch": 0.55,
+    "distance": 420
+   }
+  }
+ }
+]

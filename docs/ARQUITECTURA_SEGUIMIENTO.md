@@ -2,7 +2,7 @@
 
 Este documento explica cómo funciona la app que hace que el Lite 6 siga a una persona con la cámara
 Orbbec Astra Pro Plus montada en la muñeca, y cómo lanzarla en el robot real. La calibración
-hand-eye está en `README.md`; lo pendiente y el historial de ajustes, en `docs/PLAN_PENDIENTE.md`.
+hand-eye está en `docs/CALIBRACION_HANDEYE.md`; lo pendiente y el historial de ajustes, en `docs/PLAN_PENDIENTE.md`.
 
 ---
 
