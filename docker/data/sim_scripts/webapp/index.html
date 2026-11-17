@@ -90,7 +90,7 @@
       <h2>Objetivo</h2>
       <div class="ids" id="ids"><span class="muted">nadie a la vista</span></div>
       <div class="row">
-        <button id="b-near">Más cercana</button>
+        <button id="b-near" title="Sigue siempre a la persona más cercana (los clics no cambian el objetivo)">Más cercana: auto</button>
         <button id="b-release">Soltar</button>
       </div>
       <div style="margin-top:8px" id="target" class="muted">Sin objetivo</div>
@@ -149,7 +149,7 @@ $('b-track').onclick = () => st.tracking != null && send({cmd: 'tracking', on: !
 $('b-watch').onclick = () => send({cmd: 'watch'});
 $('b-ready').onclick = () => send({cmd: 'ready'});
 $('b-stop').onclick = () => send({cmd: 'stop'});
-$('b-near').onclick = () => send({cmd: 'select', id: -1});
+$('b-near').onclick = () => st.auto != null && send({cmd: 'auto', on: !st.auto});
 $('b-release').onclick = () => send({cmd: 'select', id: -2});
 
 // --- jog ---
@@ -187,6 +187,10 @@ function render() {
   if (st.tracking == null) { t.textContent = 'esperando tracker…'; t.className = 'big off'; }
   else if (st.tracking) { t.textContent = 'SEGUIMIENTO ON · pausar'; t.className = 'big on'; }
   else { t.textContent = 'EN PAUSA · activar'; t.className = 'big off'; }
+
+  const n = $('b-near');
+  n.textContent = st.auto == null ? 'Más cercana: ?' : `Más cercana: ${st.auto ? 'ON' : 'OFF'}`;
+  n.classList.toggle('sel', !!st.auto);
 
   const r = st.robot;
   if (!r) pill($('p-robot'), 'robot sin estado', 'bad');

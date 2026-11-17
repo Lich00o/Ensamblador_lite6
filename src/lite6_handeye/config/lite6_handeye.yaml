@@ -17,6 +17,7 @@ charuco_detector:
     max_reproj_rmse_px: 1.0
     publish_tf: true
     publish_debug_image: true
+    debug_image_scale: 0.5      # ~/debug_image a 640x360: 4x menos datos hacia la app web
 
 handeye_auto_calibrator:
   ros__parameters:
@@ -92,13 +93,16 @@ person_tracker:
     deadband_enter_deg: 5.0     # quieto mientras la cabeza esté a < 5° del eje óptico
     deadband_exit_deg: 2.0      # al salir de la zona, recentra hasta < 2° (histéresis)
     id_tracking: true           # ByteTrack: ID por persona, se sigue solo el objetivo elegido
-    auto_select_target: false   # true = sin objetivo, tomar la persona más cercana
+    auto_select_target: false   # true = seguir siempre el ID más cercano (app web: interruptor "Más cercana")
+    auto_switch_ratio: 1.3      # cambia al otro ID solo si su caja es 1.3x mayor (evita saltar entre dos)
     track_high_thresh: 0.5      # ByteTrack: puntaje 'alto' (1.ª asociación)
     track_low_thresh: 0.15      # ByteTrack: puntaje 'bajo' (2.ª asociación, oclusiones parciales)
+    max_people: 3               # máx. personas por cuadro (mayor puntaje); menos = menos ReID por cuadro
     track_buffer_s: 3.0         # ByteTrack: cuánto se conserva un ID perdido
     reid_enabled: true          # galería de IDs: quien sale de cuadro vuelve con su mismo ID (apariencia)
     reid_buffer_s: 120.0        # cuánto recuerda la galería un ID expirado
     reid_model: ~/.ros/lite6_handeye/models/osnet_ain_x1_0_msmt17.onnx  # ReID (HF mprib/osnet-ain-x1-0-msmt17-onnx)
+    reid_every: 3               # embeddings ReID cada 3 cuadros (ahorra ~6 ms/cuadro con 3 personas)
     reid_thresh: 0.8            # similitud coseno mínima; con 0.6 fusionó a dos personas (0.72). Sin validar al volver
     tracker_cmc: true           # compensa el giro de la cámara (cinemática) antes de asociar IDs
     max_wrist_jump_deg: 25.0    # descarta IK que gire J4 o J6 más (cambio de rama de muñeca)

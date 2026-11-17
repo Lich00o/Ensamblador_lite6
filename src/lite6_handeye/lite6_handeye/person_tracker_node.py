@@ -100,14 +100,17 @@ class PersonTrackerNode(Node):
         d('enable_motion', True)
         d('tracking_enabled', True)        # estado inicial del seguimiento (cambia con ~/set_tracking)
         d('id_tracking', True)             # ByteTrack: ID por persona; se sigue solo el objetivo elegido
-        d('auto_select_target', False)     # sin objetivo elegido: tomar la persona más cercana
+        d('auto_select_target', False)     # seguir siempre el ID más cercano (caja más grande); ignora clics
+        d('auto_switch_ratio', 1.3)        # cambia de ID solo si el otro tiene caja N veces mayor (histéresis)
         d('track_high_thresh', 0.5)        # ByteTrack: detección 'alta' (1.ª asociación)
         d('track_low_thresh', 0.15)        # ByteTrack: detección 'baja' (2.ª asociación, oclusiones)
+        d('max_people', 3)                 # máx. personas por cuadro (las de mayor puntaje): limita ReID y tracks
         d('track_buffer_s', 3.0)           # ByteTrack: tiempo que un ID perdido se conserva
         d('camera_fps', 30.0)              # cuadros/s de la cámara (convierte track_buffer_s a cuadros)
         d('reid_enabled', True)            # galería de IDs: quien sale de cuadro vuelve con su ID (ropa)
         d('reid_buffer_s', 120.0)          # cuánto recuerda la galería un ID expirado
         d('reid_model', '')                # ReID ONNX (OSNet-AIN); '' = histograma de color (poco fiable)
+        d('reid_every', 3)                 # embeddings ReID cada N cuadros (el descriptor del track es un promedio)
         d('reid_thresh', 0.6)              # similitud mínima (coseno con reid_model; Bhattacharyya sin él)
         d('tracker_cmc', True)             # compensar el giro de la cámara (cinemática) en el tracker
         d('move_to_watch_on_start', True)
@@ -127,6 +130,7 @@ class PersonTrackerNode(Node):
         d('max_wrist_jump_deg', 25.0)      # descarta IK que gire J4 o J6 más (cambio de rama de muñeca)
         d('lost_timeout', 5.0)             # s sin detección antes de volver a WATCH_JOINTS
         d('publish_debug_image', True)
+        d('debug_image_scale', 0.5)        # escala de ~/debug_image (1 = resolución de la cámara); los clics se reescalan
 
         self.P = lambda n: self.get_parameter(n).value  # noqa: E731
         self.base_frame = self.P('robot_base_frame')
@@ -206,9 +210,13 @@ class PersonTrackerNode(Node):
             callback_group=cb)
         self.create_subscription(
             JointState, self.P('joint_states_topic'), self._on_js, 50, callback_group=cb)
+        # grupo propio: un cuadro a la vez (sin carreras en el tracker ni hilos peleando el GIL);
+        # profundidad 1: siempre el cuadro más nuevo, los atrasados se descartan
         self.create_subscription(
-            Image, self.P('image_topic'), self._on_image, qos_profile_sensor_data,
-            callback_group=cb)
+            Image, self.P('image_topic'), self._on_image,
+            QoSProfile(depth=1, reliability=qos_profile_sensor_data.reliability),
+            callback_group=MutuallyExclusiveCallbackGroup())
+        self.n_frames = 0
         if self.P('robot_states_topic') and RobotMsg is not None:
             self.robot_ok = False
             self.create_subscription(RobotMsg, self.P('robot_states_topic'), self._on_robot_state, 10,
@@ -364,7 +372,8 @@ class PersonTrackerNode(Node):
     def _on_click(self, msg):
         with self.lock:
             tracks = list(self.tracks)
-        t = byte_tracker.select_at(tracks, msg.x, msg.y)
+        s = float(self.P('debug_image_scale')) or 1.0         # clic en píxeles de ~/debug_image
+        t = byte_tracker.select_at(tracks, msg.x / s, msg.y / s)
         if t is None:
             self._set_target(None, 'clic fuera de personas')
         else:
@@ -509,11 +518,16 @@ class PersonTrackerNode(Node):
         tracks = None
         if self.P('id_tracking'):
             dets = self.detector.detect_all(bgr, K, float(self.P('track_low_thresh')))
+            dets = sorted(dets, key=lambda dd: dd.score, reverse=True)[:max(1, int(self.P('max_people')))]
+            # ReID solo en detecciones 'altas': las bajas solo asocian por IoU (oclusiones)
+            self.n_frames += 1
+            hi = ([dd for dd in dets if dd.score >= float(self.P('track_high_thresh'))]
+                  if self.n_frames % max(1, int(self.P('reid_every'))) == 0 else [])
             if self.reid_embedder is not None:
-                for dd, f in zip(dets, self.reid_embedder(bgr, [dd.bbox for dd in dets])):
+                for dd, f in zip(hi, self.reid_embedder(bgr, [dd.bbox for dd in hi])):
                     dd.feat = f
             elif self.P('reid_enabled'):
-                for dd in dets:
+                for dd in hi:
                     dd.feat = byte_tracker.appearance_feature(bgr, dd.bbox)
             if self.P('tracker_cmc'):
                 # rotación de la cámara desde el cuadro anterior -> homografía de píxeles
@@ -530,14 +544,19 @@ class PersonTrackerNode(Node):
                 self.target_id = self.byte.aliases[self.target_id]
             if self.target_id is not None and not self.byte.known(self.target_id):
                 self._set_target(None, 'ID expirado')
-            if self.target_id is None and self.P('auto_select_target'):
+            if self.P('auto_select_target'):
                 t = byte_tracker.select_nearest(tracks)
-                if t is not None:
-                    self._set_target(t.id, 'auto')
+                cur = self.byte.get(self.target_id)
+                if t is not None and t.id != self.target_id:
+                    area = lambda x: x.bbox[2] * x.bbox[3]  # noqa: E731
+                    if (cur is None or not cur.visible
+                            or area(t) > float(self.P('auto_switch_ratio')) * area(cur)):
+                        self._set_target(t.id, 'la más cercana (auto)')
             tgt = self.byte.get(self.target_id)
             det = tgt.det if (tgt is not None and tgt.visible) else None
             self.pub_tracks.publish(String(data=json.dumps({
                 'target': self.target_id,
+                'auto': bool(self.P('auto_select_target')),
                 'tracks': [{'id': t.id, 'visible': t.visible, 'score': round(float(t.det.score), 2),
                             'bbox': [int(v) for v in t.bbox]} for t in tracks],
                 'gallery': sorted(self.byte.gallery)})))
@@ -633,7 +652,7 @@ class PersonTrackerNode(Node):
                                       dq / float(self.P('max_joint_vel_rad_s')))
                             self._send_trajectory(q_sol, dur)
 
-        if self.P('publish_debug_image') and self.pub_dbg.get_subscription_count() >= 0:
+        if self.P('publish_debug_image') and self.pub_dbg.get_subscription_count() > 0:
             dbg = person_tracker.draw_debug(bgr, det, self.target_base)
             if tracks is not None:
                 byte_tracker_draw(dbg, tracks, self.target_id)
@@ -642,6 +661,9 @@ class PersonTrackerNode(Node):
                      else f'ROBOT NO LISTO ({self.robot_status})')
             cv2.putText(dbg, label, (18, dbg.shape[0] - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.9,
                         (0, 200, 0) if on else (0, 0, 255), 2, cv2.LINE_AA)
+            s = float(self.P('debug_image_scale'))
+            if 0 < s < 1:
+                dbg = cv2.resize(dbg, None, fx=s, fy=s, interpolation=cv2.INTER_AREA)
             self.pub_dbg.publish(bgr_to_msg(dbg, msg.header, Image))
 
 

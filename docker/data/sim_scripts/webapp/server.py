@@ -26,6 +26,8 @@ from controller_manager_msgs.srv import ListControllers, SwitchController
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, StreamingResponse
 from geometry_msgs.msg import Point
+from rcl_interfaces.msg import Parameter, ParameterType, ParameterValue
+from rcl_interfaces.srv import SetParameters
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 from rclpy.qos import DurabilityPolicy, QoSProfile, qos_profile_sensor_data
@@ -80,6 +82,7 @@ class Bridge(Node):
         self.create_subscription(Image, f'{NS}/debug_image', self.frames['debug'].put, qos_profile_sensor_data)
         self.create_subscription(Image, '/camera/color/image_raw', self.frames['raw'].put, qos_profile_sensor_data)
         self.tracking, self.robot, self.tracks, self.target = None, None, [], None
+        self.auto = None                  # auto_select_target del tracker (None = sin noticias)
         self.gallery = []
         self.ctrl_state, self.msg, self.msg_t = '?', '', 0.0
         latched = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)
@@ -96,6 +99,7 @@ class Bridge(Node):
             'state': self.create_client(SetInt16, '/ufactory/set_state'),
             'switch': self.create_client(SwitchController, '/controller_manager/switch_controller'),
             'list': self.create_client(ListControllers, '/controller_manager/list_controllers'),
+            'params': self.create_client(SetParameters, f'{NS}/set_parameters'),
         }
         self.jog = Jogger(self, on_start=self.pause_tracking)
         self.jog.robot_ok = self.robot_ok
@@ -105,6 +109,7 @@ class Bridge(Node):
     def _on_tracks(self, m):
         d = json.loads(m.data)
         self.tracks, self.target, self.gallery = d['tracks'], d['target'], d.get('gallery', [])
+        self.auto = d.get('auto')
 
     def robot_ok(self):
         return self.robot is not None and self.robot[0] == 1 and self.robot[2] == 0 and self.robot[1] in (0, 1, 2)
@@ -141,7 +146,7 @@ class Bridge(Node):
             'joints': None if q is None else [round(float(v), 1) for v in np.degrees(q)],
             'tcp': None if tcp is None else {'xyz': [round(float(v)) for v in tcp[0]],
                                              'rpy': [round(float(v), 1) for v in tcp[1]]},
-            'tracks': self.tracks, 'target': self.target, 'gallery': self.gallery,
+            'tracks': self.tracks, 'target': self.target, 'gallery': self.gallery, 'auto': self.auto,
             # fps 0 si el topic dejó de publicar (> 1 s sin cuadros): así se ve un tracker caído
             'fps': {k: round(f.fps, 1) if now - f.t < 1.0 else 0.0 for k, f in self.frames.items()},
             'jogging': self.jog.axis is not None, 'speed': round(self.jog.speed * 100),
@@ -183,6 +188,11 @@ class Bridge(Node):
             self.jog.release()
             self.pause_tracking()
             self._call('state', SetInt16.Request(data=4), 'STOP')
+        elif cmd == 'auto':
+            # ON: el tracker sigue siempre el ID más cercano (cambia si otro queda claramente más cerca)
+            v = ParameterValue(type=ParameterType.PARAMETER_BOOL, bool_value=bool(c['on']))
+            self._call('params', SetParameters.Request(
+                parameters=[Parameter(name='auto_select_target', value=v)]), 'más cercana automática')
         elif cmd == 'select':
             self.pub_sel.publish(Int32(data=int(c['id'])))
         elif cmd == 'click':
