@@ -61,6 +61,12 @@ docker exec -it lite6_gpu bash /home/ubuntu/.ros/lite6_handeye/sim_scripts/pt_re
 # app web: http://localhost:8080
 ```
 
+Guardar el robot en su caja (sin herramientas; J1 = 180°, resto 0°):
+
+```bash
+docker exec lite6_gpu python3 /home/ubuntu/.ros/lite6_handeye/sim_scripts/pose_guardado.py
+```
+
 Antes de esto: crear el entorno Docker (`docker/README.md`), bajar los modelos (`docker/data/models/README.md`)
 y calibrar (`docs/CALIBRACION_HANDEYE.md`).
 
